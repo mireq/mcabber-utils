@@ -56,7 +56,7 @@ class Handlers(object):
 
 	def UNREAD(self, line):
 		parts, cmd, kind, who = self.parse(line)
-		unread = int(parts[1])
+		unread = int(parts[1].split()[0])
 		if unread > 1:
 			generateNotification('%s unread messages' % unread, '')
 
