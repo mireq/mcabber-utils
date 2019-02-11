@@ -6,34 +6,38 @@ import re
 import sys
 import time
 
+
 LOW = -1
 NORMAL = -2
 CRITICAL = -3
 MAX_MSG_LEN = 60
 PAUSE = 0.2
-encoding = locale.getdefaultlocale()[1]
+
 
 def notifier_init():
-	if sys.platform == 'linux2':
-		import pynotify
-		pynotify.init('mcabber')
+	if sys.platform == 'linux':
+		import notify2
+		notify2.init('mcabber')
+
 
 def notifier_close():
-	if sys.platform == 'linux2':
-		import pynotify
-		pynotify.uninit()
+	if sys.platform == 'linux':
+		import notify2
+		notify2.uninit()
 
-if sys.platform == 'linux2':
+
+if sys.platform == 'linux':
 	def generateNotification(title, body, urgency=LOW):
-		import pynotify
-		urg = {LOW : pynotify.URGENCY_LOW, NORMAL : pynotify.URGENCY_NORMAL, CRITICAL : pynotify.URGENCY_CRITICAL}
-		n = pynotify.Notification(unicode(title, encoding), unicode(body, encoding))
+		import notify2
+		urg = {LOW : notify2.URGENCY_LOW, NORMAL : notify2.URGENCY_NORMAL, CRITICAL : notify2.URGENCY_CRITICAL}
+		n = notify2.Notification(title, body)
 		n.set_timeout(4500)
 		n.set_urgency(urg[urgency])
 		n.show()
 elif sys.platform == 'darwin':
 	def generateNotification(title, body, urgency=LOW):
 		os.system('growlnotify --name="mcabber" -m "%s"' % ('%s\n%s' % (title, body)))
+
 
 class Handlers(object):
 	status_map = {'O' : 'online', '_' : 'offline', 'A' : 'away', 'I' : 'invisible', 'F' : 'free to chat', 'D' : 'do not disturb', 'N' : 'not available'}
@@ -89,11 +93,11 @@ def main():
 				if hasattr(h, cmd):
 					getattr(h, cmd)(line)
 				else:
-					print line
+					print(line)
 			time.sleep(PAUSE)
 	finally:
 		notifier_close()
 
+
 if __name__ == '__main__':
 	main()
-
